@@ -19,42 +19,16 @@
 	<!--表单验证-->
 	<script src="../javaex/pc/js/javaex-formVerify.js"></script>
 	<title>图书管理系统</title>
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<style>
-		.isbn-search-container {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			margin-top: 20px;
-		}
-		.isbn-search-form {
-			padding: 20px;
-			border: 1px solid #ccc;
-			text-align: center;
-			background-color: #fff;
-			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-			width: 300px;
-		}
-		#bookInfoDisplay {
-			margin-top: 20px;
-			padding: 20px;
-			border-top: 1px solid #eee;
-			text-align: left;
-			background-color: #ffffff;
-			overflow-y: auto;
-			max-height: 500px; /* 限制高度，确保可以滚动 */
-			width: 100%;
-			box-sizing: border-box; /* 确保padding不影响宽度 */
-		}
 	</style>
 </head>
 <body>
-
-<!--原本的界面布局-->
+<!--顶部导航-->
 <div class="admin-navbar">
 	<div class="admin-container-fluid clear">
 		<!--logo名称-->
 		<div class="admin-logo">Library management system</div>
+
 		<!--右侧-->
 		<ul class="admin-navbar-nav fr">
 			<li>
@@ -67,7 +41,8 @@
 	</div>
 </div>
 
-<div class="admin-main">
+<!--主题内容-->
+<div class="admin-mian">
 	<!--左侧菜单-->
 	<div class="admin-aside admin-aside-fixed">
 		<!-- 应用标题  -->
@@ -78,6 +53,15 @@
 						<li class="menu-item hover">
 							<a href="javascript:page('welcome');"><i class="icon-home2"></i>Home page</a>
 						</li>
+
+						<!--<li class="menu-item">
+							<a href="javascript:;">图书管理<i class="icon-keyboard_arrow_left"></i></a>
+							<ul>
+								<li><a href="javascript:page('book/list');">图书列表</a></li>
+								<li><a href="javascript:page('book/add');">图书上架</a></li>
+							</ul>
+						</li>-->
+
 						<li class="menu-item">
 							<a href="javascript:;">Loan management<i class="icon-keyboard_arrow_left"></i></a>
 							<ul>
@@ -86,10 +70,20 @@
 								<li><a href="javascript:page('/borrow/back');">Return books</a></li>
 							</ul>
 						</li>
+
+						<!--<li class="menu-item">
+							<a href="javascript:;">读者管理<i class="icon-keyboard_arrow_left"></i></a>
+							<ul>
+								<li><a href="javascript:page('/reader/list');">读者列表</a></li>
+								&lt;!&ndash;<li><a href="javascript:page('reader/add');">读者添加</a></li>&ndash;&gt;
+							</ul>
+						</li>-->
+
 						<li class="menu-item">
 							<a href="javascript:;">Individual center<i class="icon-keyboard_arrow_left"></i></a>
 							<ul>
 								<li><a href="javascript:page('/user/info');">Personal information</a></li>
+								<!--<li><a href="javascript:page('user/list');">用户管理</a></li>-->
 							</ul>
 						</li>
 					</ul>
@@ -103,27 +97,17 @@
 		<iframe id="page" src="welcome"></iframe>
 	</div>
 </div>
-
-<!-- ISBN搜索框 -->
-<div class="isbn-search-container">
-	<div class="isbn-search-form">
-		<h3>Search Book by ISBN</h3>
-		<input type="text" id="isbnInput" placeholder="Enter ISBN" />
-		<button onclick="searchBookByISBN()">Search</button>
-		<div id="bookInfoDisplay"></div>
-	</div>
-</div>
-
+</body>
 <script>
 	var hightUrl = "xxxx";
 	javaex.menu({
-		id: "menu",
-		isAutoSelected: true,
-		key: "",
-		url: hightUrl
+		id : "menu",
+		isAutoSelected : true,
+		key : "",
+		url : hightUrl
 	});
 
-	$(function () {
+	$(function() {
 		// 设置左侧菜单高度
 		setMenuHeight();
 	});
@@ -134,7 +118,7 @@
 	function setMenuHeight() {
 		var height = document.documentElement.clientHeight - $("#admin-toc").offset().top;
 		height = height - 10;
-		$("#admin-toc").css("height", height + "px");
+		$("#admin-toc").css("height", height+"px");
 	}
 
 	// 控制页面载入
@@ -142,38 +126,9 @@
 		$("#page").attr("src", url);
 	}
 
-	function searchBookByISBN() {
-		console.log('Search button clicked');
-		var isbn = $('#isbnInput').val().trim();
-		if (isbn) {
-			$.ajax({
-				url: '/book/isbn/' + isbn,
-				type: 'GET',
-				success: function (response) {
-					displayBookInfo(response);
-				},
-				error: function (xhr) {
-					$('#bookInfoDisplay').html('<p>Error fetching book information: ' + xhr.responseText + '</p>');
-				}
-			});
-		} else {
-			$('#bookInfoDisplay').html('<p>Please enter a valid ISBN.</p>');
-		}
-	}
+	$(document).ready(function(){
+		// 页面一加载, 读取登录用户信息
 
-	function displayBookInfo(book) {
-		var html = '<h4>Book Information</h4>';
-		if (book && book.title) {
-			html += '<p>Title: ' + book.title + '</p>';
-			html += '<p>Author: ' + book.author + '</p>';
-			html += '<p>Publisher: ' + book.publisher + '</p>';
-			html += '<p>Publication Date: ' + book.pubdate + '</p>';
-			html += '<p>Price: ' + book.price + '</p>';
-		} else {
-			html = '<p>No information found for the provided ISBN.</p>';
-		}
-		$('#bookInfoDisplay').html(html);
-	}
+	});
 </script>
-</body>
 </html>
