@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta charset="utf-8">
+	<!--字体图标-->
+	<link href="../javaex/pc/css/icomoon.css" rel="stylesheet" />
+	<!--动画-->
+	<link href="../javaex/pc/css/animate.css" rel="stylesheet" />
+	<!--骨架样式-->
+	<link href="../javaex/pc/css/common.css" rel="stylesheet" />
+	<!--皮肤（缇娜）-->
+	<link href="../javaex/pc/css/skin/tina.css" rel="stylesheet" />
+	<!--jquery，不可修改版本-->
+	<script src="../javaex/pc/lib/jquery-1.7.2.min.js"></script>
+	<!--全局动态修改-->
+	<script src="../javaex/pc/js/common.js"></script>
+	<!--核心组件-->
+	<script src="../javaex/pc/js/javaex.min.js"></script>
+	<!--表单验证-->
+	<script src="../javaex/pc/js/javaex-formVerify.js"></script>
+	<title>图书管理系统</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<style>
+		.isbn-search-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-top: 20px;
+		}
+		.isbn-search-form {
+			padding: 20px;
+			border: 1px solid #ccc;
+			text-align: center;
+			background-color: #fff;
+			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+			width: 300px;
+		}
+		#bookInfoDisplay {
+			margin-top: 20px;
+			padding: 20px;
+			border-top: 1px solid #eee;
+			text-align: left;
+			background-color: #ffffff;
+			overflow-y: auto;
+			max-height: 500px; /* 限制高度，确保可以滚动 */
+			width: 100%;
+			box-sizing: border-box; /* 确保padding不影响宽度 */
+		}
+	</style>
+</head>
+<body>
+
+<!--原本的界面布局-->
+<div class="admin-navbar">
+	<div class="admin-container-fluid clear">
+		<!--logo名称-->
+		<div class="admin-logo">Library management system</div>
+		<!--右侧-->
+		<ul class="admin-navbar-nav fr">
+			<li>
+				<a href="javascript:;">Welcome</a>
+				<ul class="dropdown-menu" style="right: 10px;">
+					<li><a href="/logout">Exit</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="admin-main">
+	<!--左侧菜单-->
+	<div class="admin-aside admin-aside-fixed">
+		<!-- 应用标题  -->
+		<div id="admin-toc" class="admin-toc">
+			<div class="menu-box">
+				<div id="menu" class="menu">
+					<ul>
+						<li class="menu-item hover">
+							<a href="javascript:page('welcome');"><i class="icon-home2"></i>Home page</a>
+						</li>
+						<li class="menu-item">
+							<a href="javascript:;">Loan management<i class="icon-keyboard_arrow_left"></i></a>
+							<ul>
+								<li><a href="javascript:page('/borrow/book-search');">Search book</a></li>
+								<li><a href="javascript:page('/borrow/borrow');">Borrow books</a></li>
+								<li><a href="javascript:page('/borrow/back');">Return books</a></li>
+							</ul>
+						</li>
+						<li class="menu-item">
+							<a href="javascript:;">Individual center<i class="icon-keyboard_arrow_left"></i></a>
+							<ul>
+								<li><a href="javascript:page('/user/info');">Personal information</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--iframe载入内容-->
+	<div class="admin-markdown">
+		<iframe id="page" src="welcome"></iframe>
+	</div>
+</div>
+
+<!-- ISBN搜索框 -->
+<div class="isbn-search-container">
+	<div class="isbn-search-form">
+		<h3>Search Book by ISBN</h3>
+		<input type="text" id="isbnInput" placeholder="Enter ISBN" />
+		<button onclick="searchBookByISBN()">Search</button>
+		<div id="bookInfoDisplay"></div>
+	</div>
+</div>
+
+<script>
+	var hightUrl = "xxxx";
+	javaex.menu({
+		id: "menu",
+		isAutoSelected: true,
+		key: "",
+		url: hightUrl
+	});
+
+	$(function () {
+		// 设置左侧菜单高度
+		setMenuHeight();
+	});
+
+	/**
+	 * 设置左侧菜单高度
+	 */
+	function setMenuHeight() {
+		var height = document.documentElement.clientHeight - $("#admin-toc").offset().top;
+		height = height - 10;
+		$("#admin-toc").css("height", height + "px");
+	}
+
+	// 控制页面载入
+	function page(url) {
+		$("#page").attr("src", url);
+	}
+
+	function searchBookByISBN() {
+		console.log('Search button clicked');
+		var isbn = $('#isbnInput').val().trim();
+		if (isbn) {
+			$.ajax({
+				url: '/book/isbn/' + isbn,
+				type: 'GET',
+				success: function (response) {
+					displayBookInfo(response);
+				},
+				error: function (xhr) {
+					$('#bookInfoDisplay').html('<p>Error fetching book information: ' + xhr.responseText + '</p>');
+				}
+			});
+		} else {
+			$('#bookInfoDisplay').html('<p>Please enter a valid ISBN.</p>');
+		}
+	}
+
+	function displayBookInfo(book) {
+		var html = '<h4>Book Information</h4>';
+		if (book && book.title) {
+			html += '<p>Title: ' + book.title + '</p>';
+			html += '<p>Author: ' + book.author + '</p>';
+			html += '<p>Publisher: ' + book.publisher + '</p>';
+			html += '<p>Publication Date: ' + book.pubdate + '</p>';
+			html += '<p>Price: ' + book.price + '</p>';
+		} else {
+			html = '<p>No information found for the provided ISBN.</p>';
+		}
+		$('#bookInfoDisplay').html(html);
+	}
+</script>
+</body>
+</html>
